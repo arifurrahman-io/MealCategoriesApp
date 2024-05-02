@@ -1,39 +1,54 @@
 import { StyleSheet, FlatList, View, Text } from "react-native";
 import MealItem from "../components/MealItem";
 
-import { MEALS } from "../data/dummy-data";
+import { MEALS, CATEGORIES } from "../data/dummy-data";
+import { useLayoutEffect } from "react";
 
+function MealsOverviewScreen({ route, navigation }) {
+  const catId = route.params.categoryId;
+  const displayedMeals = MEALS.filter((mealItem) => {
+    return mealItem.categoryIds.indexOf(catId) >= 0;
+  });
 
-function MealsOverviewScreen({route}){
-    
-    const catId = route.params.categoryId;
-    const displayedMeals = MEALS.filter((mealItem)=>{
-        return mealItem.categoryIds.indexOf(catId) >= 0;
-    })
+  useLayoutEffect(() => {
+    const categoryTitle = CATEGORIES.find(
+      (category) => category.id === catId
+    ).title;
 
-    function renderMealItem(itemData){
-        const item = itemData.item;
-        const mealItemProps = {
-            title: item.title,
-            imageUrl: item.imageUrl,
-            duration: item.duration,
-            complexity: item.complexity,
-            affordability: item.affordability,
+    navigation.setOptions({
+      title: categoryTitle,
+    });
+  }, [catId, navigation]);
 
-        }
-        return <MealItem {...mealItemProps}/>
-    }
+  function renderMealItem(itemData) {
+    const item = itemData.item;
+    const mealItemProps = {
+      id: item.id,
+      title: item.title,
+      imageUrl: item.imageUrl,
+      duration: item.duration,
+      complexity: item.complexity,
+      affordability: item.affordability,
+    };
+    return <MealItem {...mealItemProps} />;
+  }
 
-    return <View style={styles.container}>
-        <FlatList data={displayedMeals} keyExtractor={(item)=>item.id} renderItem={renderMealItem}/>
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={displayedMeals}
+        keyExtractor={(item) => item.id}
+        renderItem={renderMealItem}
+      />
     </View>
+  );
 }
 
 export default MealsOverviewScreen;
 
 const styles = StyleSheet.create({
-container:{
-    flex:1,
+  container: {
+    flex: 1,
     padding: 16,
-}
-})
+  },
+});
